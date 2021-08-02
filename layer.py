@@ -117,10 +117,10 @@ class FeedForwardNetII(nn.Module):
             if layer_id==0:
                 continue
             elif layer_id== self.n_layers - 1:
-#                x = self.dropout(self.prelu(x))
+                x = self.dropout(self.prelu(x))
                 x = layer(x)
             else:
-#                x = self.dropout(self.prelu(x))
-                x = layer(x,h0)
                 x = self.dropout(self.prelu(x))
+                x = layer(x,h0)
+#                x = self.dropout(self.prelu(x))
         return x
