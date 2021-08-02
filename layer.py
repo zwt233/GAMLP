@@ -32,29 +32,28 @@ class Dense(nn.Module):
         if self.in_features == self.out_features:
             output = output + input
         return output
-# MLP apply initial residual 
+# MLP apply initial residual
 class GraphConvolution(nn.Module):
     def __init__(self, in_features, out_features,alpha):
-        super(GraphConvolution, self).__init__() 
+        super(GraphConvolution, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.weight = Parameter(torch.FloatTensor(self.in_features,self.out_features))
         self.alpha=alpha
         self.reset_parameters()
         self.bias = nn.BatchNorm1d(out_features)
-        self.reset_parameters()
     def reset_parameters(self):
         stdv = 1. / math.sqrt(self.out_features)
         self.weight.data.uniform_(-stdv, stdv)
 
-    def forward(self, input ,h0):    
-        support = (1-self.alpha)*input+self.alpha*h0      
+    def forward(self, input ,h0):
+        support = (1-self.alpha)*input+self.alpha*h0
         output = torch.mm(support, self.weight)
-        output=self.bias(output)        
+        output=self.bias(output)
         if self.in_features==self.out_features:
             output = output+input
         return output
-        
+
 # adapted from dgl sign
 class FeedForwardNet(nn.Module):
     def __init__(self, in_feats, hidden, out_feats, n_layers, dropout):
@@ -66,7 +65,7 @@ class FeedForwardNet(nn.Module):
             self.layers.append(nn.Linear(in_feats, out_feats))
         else:
             self.layers.append(nn.Linear(in_feats, hidden))
-            self.bns.append(nn.BatchNorm1d(hidden))            
+            self.bns.append(nn.BatchNorm1d(hidden))
             for i in range(n_layers - 2):
                 self.layers.append(nn.Linear(hidden, hidden))
                 self.bns.append(nn.BatchNorm1d(hidden))
@@ -103,7 +102,7 @@ class FeedForwardNetII(nn.Module):
             self.layers.append(Dense(in_feats, hidden))
             for i in range(n_layers - 2):
                 self.layers.append(GraphConvolution(hidden, hidden,alpha))
-            self.layers.append(Dense(hidden, out_feats))                       
+            self.layers.append(Dense(hidden, out_feats))
 
         self.prelu = nn.PReLU()
         self.dropout = nn.Dropout(dropout)
@@ -118,8 +117,10 @@ class FeedForwardNetII(nn.Module):
             if layer_id==0:
                 continue
             elif layer_id== self.n_layers - 1:
-                x = layer(x)                 
-            else:            
+#                x = self.dropout(self.prelu(x))
+                x = layer(x)
+            else:
+#                x = self.dropout(self.prelu(x))
                 x = layer(x,h0)
-                x = self.dropout(self.prelu(x))                
+                x = self.dropout(self.prelu(x))
         return x
