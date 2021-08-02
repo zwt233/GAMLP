@@ -114,11 +114,14 @@ def test(model, feats, labels, test_loader, evaluator,
     model.eval()
     device = labels.device
     preds = []
+    true=[]
     for batch in test_loader:
         batch_feats = [feat[batch].to(device) for feat in feats]
         preds.append(torch.argmax(model(batch_feats,label_emb[batch].to(device)), dim=-1))
+        true.append(labels[batch])
+    true=torch.cat(true)
     preds = torch.cat(preds, dim=0)
-    res = evaluator(preds, labels)
+    res = evaluator(preds, true)
 
     return res
 @torch.no_grad()
