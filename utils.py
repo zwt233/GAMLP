@@ -28,33 +28,19 @@ def gen_model_mag_rdd(args,num_feats,in_feats,num_classes):
 def gen_model(args,in_size,num_classes):
     if args.method=="R_GAMLP":
         return R_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-<<<<<<< HEAD
                  args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
     elif args.method=="JK_GAMLP":
         return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
-=======
-                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
-    elif args.method=="JK_GAMLP":
-        return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
 
 def gen_model_rdd(args,in_size,num_classes):
     if args.method=="R_GAMLP_RDD":
         return R_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-<<<<<<< HEAD
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
 
     elif args.method=="JK_GAMLP_RDD":
         return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
-=======
-                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
-    elif args.method=="JK_GAMLP_RDD":
-        return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
 
 def set_seed(seed=0):
     random.seed(seed)
@@ -132,10 +118,9 @@ def test(model, feats, labels, test_loader, evaluator,
         batch_feats = [feat[batch].to(device) for feat in feats]
         preds.append(torch.argmax(model(batch_feats,label_emb[batch].to(device)), dim=-1))
     preds = torch.cat(preds, dim=0)
-    train_res = evaluator(preds[:len(train_nid)], labels[:len(train_nid)])
-    val_res = evaluator(preds[len(train_nid):len(train_nid)+len(val_nid)], labels[len(train_nid):len(train_nid)+len(val_nid)])
-    test_res = evaluator(preds[len(train_nid)+len(val_nid):len(train_nid)+len(val_nid)+len(test_nid)], labels[len(train_nid)+len(val_nid):len(train_nid)+len(val_nid)+len(test_nid)])
-    return train_res, val_res, test_res
+    res = evaluator(preds, labels)
+
+    return res
 @torch.no_grad()
 def gen_output(model, feats, test_loader,device,label_emb):
     model.eval()

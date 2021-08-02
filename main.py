@@ -73,11 +73,7 @@ def run(args, device):
         all_loader = torch.utils.data.DataLoader(
             torch.arange(len(train_nid)+len(val_nid)+len(test_nid)), batch_size=args.batch_size,
             shuffle=False, drop_last=False)
-<<<<<<< HEAD
         num_hops = args.num_hops + 1
-=======
-        num_hops = args.R + 1
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
         if args.use_rdd=='False':
             if args.dataset=="ogbn-products":
                 model=gen_model(args,in_size,num_classes)
@@ -106,20 +102,12 @@ def run(args, device):
         record={}
         count=0
 
-<<<<<<< HEAD
         for epoch in range(epochs):
             gc.collect()
             start = time.time()
             if stage==0:
                 train(model, feats, labels, loss_fcn, optimizer, train_loader,label_emb)
             elif stage>0:
-=======
-        for stage,epoch in enumerate(args.stages):
-            start = time.time()
-            if stage==0 and args.rdd:
-                train(model, feats, labels, loss_fcn, optimizer, train_loader)
-            elif stage>0 and args.rdd:
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
                 train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob)
             end=time.time()
             log = "Epoch {}, Time(s): {:.4f}, ".format(epoch, end - start)
@@ -133,13 +121,8 @@ def run(args, device):
                 if acc > best_val:
                     best_epoch = epoch
                     best_val = acc
-                    accs=test(model, feats, labels, test_loader, evaluator,
-<<<<<<< HEAD
+                    best_acc=test(model, feats, labels, test_loader, evaluator,
                                 train_nid, val_nid, test_nid,label_emb)
-=======
-                                train_nid, val_nid, test_nid)
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
-                    best_test=accs[2]
                     torch.save(model.state_dict(),checkpt_file+f'_{stage}.pkl')
                     count=0
                 else:
@@ -151,11 +134,7 @@ def run(args, device):
             print(log)
 
 
-<<<<<<< HEAD
         print("Best Epoch {}, Val {:.4f}, Test {:.4f}".format(
-=======
-            print("Best Epoch {}, Val {:.4f}, Test {:.4f}".format(
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
             best_epoch, best_val, best_test))
 
         model.load_state_dict(torch.load(checkpt_file+f'_{stage}.pkl'))
@@ -211,15 +190,12 @@ if __name__ == "__main__":
                         help="number of feed-forward layers")
     parser.add_argument("--n-layers-3", type=int, default=4,
                         help="number of feed-forward layers")
-    parser.add_argument("--part-3-layers", type=int, default=4,
-                        help="number of feed-forward layers")
     parser.add_argument("--num-runs", type=int, default=10,
                         help="number of times to repeat the experiment")
     parser.add_argument("--patience", type=int, default=100,
                         help="early stop of times of the experiment")
     parser.add_argument("--alpha", type=float, default=0.5,
                         help="initial residual parameter for the model")
-<<<<<<< HEAD
     parser.add_argument("--threshold", type=float, default=0.8,
                         help="initial residual parameter for the model")
     parser.add_argument("--input-drop", type=float, default=0,
@@ -235,17 +211,6 @@ if __name__ == "__main__":
     parser.add_argument("--act", type=str, default="relu",
                         help="the activation function of the model")
     parser.add_argument("--method", type=str, default="JK_GAMLP",
-=======
-    parser.add_argument("--input-dropout", type=float, default=0,
-                        help="input dropout of input features")
-    parser.add_argument("--att-dropout", type=float, default=0.5,
-                        help="attention dropout of model")
-    parser.add_argument("--pre-process", action='store_true', default=False,
-                        help="whether to process the input features")
-    parser.add_argument("--act", type=str, default="relu",
-                        help="the activation function of the model")
-    parser.add_argument("--model", type=str, default="JK_GAMLP",
->>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
                         help="the model to use")
     parser.add_argument("--use-emb", type=str)
     parser.add_argument("--use-relation-subsets", type=str)
