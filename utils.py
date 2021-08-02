@@ -28,19 +28,33 @@ def gen_model_mag_rdd(args,num_feats,in_feats,num_classes):
 def gen_model(args,in_size,num_classes):
     if args.method=="R_GAMLP":
         return R_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
+<<<<<<< HEAD
                  args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
     elif args.method=="JK_GAMLP":
         return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
+=======
+                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
+    elif args.method=="JK_GAMLP":
+        return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
+                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
 
 def gen_model_rdd(args,in_size,num_classes):
     if args.method=="R_GAMLP_RDD":
         return R_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
+<<<<<<< HEAD
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
 
     elif args.method=="JK_GAMLP_RDD":
         return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
+=======
+                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
+    elif args.method=="JK_GAMLP_RDD":
+        return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
+                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
 
 def set_seed(seed=0):
     random.seed(seed)

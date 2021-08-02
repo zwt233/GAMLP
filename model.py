@@ -83,13 +83,20 @@ class JK_GAMLP(nn.Module):
         self.att_drop=nn.Dropout(att_dropout)
         self.pre_process=pre_process
         self.res_fc=nn.Linear(nfeat,hidden,bias=False)
+<<<<<<< HEAD
         if act=='sigmoid':
+=======
+        if activation=='sigmoid':
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
           self.act=torch.nn.Sigmoid()
         elif act=='relu':
           self.act=torch.nn.ReLU()
         elif act=='leaky_relu':
           self.act=torch.nn.LeakyReLU(0.2)
+<<<<<<< HEAD
         self.residual=residual
+=======
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
         self.reset_parameters()
     def reset_parameters(self):
         gain = nn.init.calculate_gain("relu")
@@ -148,6 +155,7 @@ class JK_GAMLP_RDD(nn.Module):
         self.label_drop=nn.Dropout(label_drop)
         self.pre_process=pre_process
         self.label_fc= FeedForwardNet(nclass, hidden, nclass, n_layers_3, dropout)
+<<<<<<< HEAD
         if act=='sigmoid':
           self.act=torch.nn.Sigmoid()
         elif act=='relu':
@@ -155,6 +163,14 @@ class JK_GAMLP_RDD(nn.Module):
         elif act=='leaky_relu':
           self.act=torch.nn.LeakyReLU(0.2)
         self.residual=residual
+=======
+        if activation=='sigmoid':
+          self.act=torch.nn.Sigmoid()
+        elif activation=='relu':
+          self.act=torch.nn.ReLU()
+        elif activation=='leaky_relu':
+          self.act=torch.nn.LeakyReLU(0.2)
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
     def reset_parameters(self):
         gain = nn.init.calculate_gain("relu")
         nn.init.xavier_uniform_(self.lr_att.weight, gain=gain)
@@ -185,7 +201,11 @@ class JK_GAMLP_RDD(nn.Module):
         if self.residual:
             right_1+= self.res_fc(feature_list[0])
             right_1 = self.dropout(self.prelu(right_1))
+<<<<<<< HEAD
         right_1 = self.lr_output(right_1)
+=======
+        right_1 = self.lr_right1(right_1)
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
         right_1 += self.label_fc(self.label_drop(label_emb))
         return right_1
 class R_GAMLP_RDD(nn.Module): #recursive GAMLP
@@ -209,7 +229,11 @@ class R_GAMLP_RDD(nn.Module): #recursive GAMLP
         self.label_drop=nn.Dropout(label_drop)
         self.residual=residual
         self.label_fc= FeedForwardNet(nclass, hidden, nclass, n_layers_3, dropout)
+<<<<<<< HEAD
         if act=='sigmoid':
+=======
+        if activation=='sigmoid':
+>>>>>>> 0bf2006756d6db4297b517a39d4c16bdedb2cdfe
           self.act=torch.nn.Sigmoid()
         elif act=='relu':
           self.act=torch.nn.ReLU()
