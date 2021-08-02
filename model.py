@@ -16,9 +16,9 @@ class R_GAMLP(nn.Module): #recursive GAMLP
         self.input_drop = nn.Dropout(input_drop)
         self.att_drop=nn.Dropout(att_dropout)
         self.pre_process=pre_process
-        self.res_fc=nn.Linear(nfeat,hidden,bias=False)        
+        self.res_fc=nn.Linear(nfeat,hidden,bias=False)
         self.residual=residual
-        if act=='sigmoid'
+        if act=='sigmoid':
           self.act=torch.nn.Sigmoid()
         elif act=='relu':
           self.act=torch.nn.ReLU()
@@ -30,10 +30,10 @@ class R_GAMLP(nn.Module): #recursive GAMLP
         nn.init.xavier_uniform_(self.lr_att.weight, gain=gain)
         nn.init.zeros_(self.lr_att.bias)
         nn.init.xavier_uniform_(self.res_fc.weight, gain=gain)
-        nn.init.zeros_(self.res_fc.bias)          
+        nn.init.zeros_(self.res_fc.bias)
         self.lr_output.reset_parameters()
         if self.pre_process:
-            for layer in self.process:             
+            for layer in self.process:
                 layer.reset_parameters()
     def forward(self, feature_list):
         num_node=feature_list[0].shape[0]
@@ -60,7 +60,7 @@ class R_GAMLP(nn.Module): #recursive GAMLP
             right_1 = right_1 + torch.mul(input_list[i],self.att_drop(attention_scores[:, i].view(num_node, 1)))
         if self.residual:
             right_1+=self.res_fc(feature_list[0])
-            right_1=self.dropout(self.prelu(right_1))            
+            right_1=self.dropout(self.prelu(right_1))
         right_1 = self.lr_output(right_1)
         return right_1
 class JK_GAMLP(nn.Module):
@@ -83,24 +83,24 @@ class JK_GAMLP(nn.Module):
         self.att_drop=nn.Dropout(att_dropout)
         self.pre_process=pre_process
         self.res_fc=nn.Linear(nfeat,hidden,bias=False)
-        if activation=='sigmoid'
+        if activation=='sigmoid':
           self.act=torch.nn.Sigmoid()
         elif activation=='relu':
           self.act=torch.nn.ReLU()
         elif activation=='leaky_relu':
           self.act=torch.nn.LeakyReLU(0.2)
-        self.reset_parameters()        
+        self.reset_parameters()
     def reset_parameters(self):
         gain = nn.init.calculate_gain("relu")
         nn.init.xavier_uniform_(self.lr_att.weight, gain=gain)
         nn.init.zeros_(self.lr_att.bias)
         nn.init.xavier_uniform_(self.res_fc.weight, gain=gain)
-        nn.init.zeros_(self.res_fc.bias)        
+        nn.init.zeros_(self.res_fc.bias)
         self.lr_output.reset_parameters()
-        self.lr_jk_ref.reset_parameters()         
+        self.lr_jk_ref.reset_parameters()
         if self.pre_process:
-            for layer in self.process:             
-                layer.reset_parameters()        
+            for layer in self.process:
+                layer.reset_parameters()
     def forward(self, feature_list):
         num_node=feature_list[0].shape[0]
         feature_list = [self.input_drop(feature) for feature in feature_list]
@@ -147,17 +147,23 @@ class JK_GAMLP_RDD(nn.Module):
         self.label_drop=nn.Dropout(label_drop)
         self.pre_process=pre_process
         self.label_fc= FeedForwardNet(nclass, hidden, nclass, n_layers_3, dropout)
+        if activation=='sigmoid':
+          self.act=torch.nn.Sigmoid()
+        elif activation=='relu':
+          self.act=torch.nn.ReLU()
+        elif activation=='leaky_relu':
+          self.act=torch.nn.LeakyReLU(0.2)
     def reset_parameters(self):
         gain = nn.init.calculate_gain("relu")
         nn.init.xavier_uniform_(self.lr_att.weight, gain=gain)
         nn.init.zeros_(self.lr_att.bias)
         nn.init.xavier_uniform_(self.res_fc.weight, gain=gain)
-        nn.init.zeros_(self.res_fc.bias)        
+        nn.init.zeros_(self.res_fc.bias)
         self.lr_output.reset_parameters()
-        self.lr_jk_ref.reset_parameters()         
+        self.lr_jk_ref.reset_parameters()
         if self.pre_process:
-            for layer in self.process:             
-                layer.reset_parameters()  
+            for layer in self.process:
+                layer.reset_parameters()
     def forward(self, feature_list,label_emb):
         num_node=feature_list[0].shape[0]
         feature_list = [self.input_drop(feature) for feature in feature_list]
@@ -166,7 +172,7 @@ class JK_GAMLP_RDD(nn.Module):
             for i in range(len(feature_list)):
                 input_list.append(self.process[i](feature_list[i]))
         concat_features = torch.cat(input_list, dim=1)
-        jk_ref =self.dropout(self.prelu(self.lr_jk_ref(concat_features)))        
+        jk_ref =self.dropout(self.prelu(self.lr_jk_ref(concat_features)))
         attention_scores = [self.act(self.lr_att(torch.cat((jk_ref, x), dim=1))).view(num_node, 1) for x in
                             input_list]
         W = torch.cat(attention_scores, dim=1)
@@ -176,7 +182,7 @@ class JK_GAMLP_RDD(nn.Module):
             right_1 = right_1 + torch.mul(input_list[i],self.att_drop(W[:, i].view(num_node, 1)))
         if self.residual:
             right_1+= self.res_fc(feature_list[0])
-            right_1 = self.dropout(self.prelu(right_1))        
+            right_1 = self.dropout(self.prelu(right_1))
         right_1 = self.lr_right1(right_1)
         right_1 += self.label_fc(self.label_drop(label_emb))
         return right_1
@@ -197,11 +203,11 @@ class R_GAMLP_RDD(nn.Module): #recursive GAMLP
         self.input_drop = nn.Dropout(input_drop)
         self.att_drop=nn.Dropout(att_dropout)
         self.pre_process=pre_process
-        self.res_fc=nn.Linear(nfeat,hidden,bias=False)    
-        self.label_drop=nn.Dropout(label_drop)            
+        self.res_fc=nn.Linear(nfeat,hidden,bias=False)
+        self.label_drop=nn.Dropout(label_drop)
         self.residual=residual
-        self.label_fc= FeedForwardNet(nclass, hidden, nclass, n_layers_3, dropout)        
-        if activation=='sigmoid'
+        self.label_fc= FeedForwardNet(nclass, hidden, nclass, n_layers_3, dropout)
+        if activation=='sigmoid':
           self.act=torch.nn.Sigmoid()
         elif activation=='relu':
           self.act=torch.nn.ReLU()
@@ -213,10 +219,10 @@ class R_GAMLP_RDD(nn.Module): #recursive GAMLP
         nn.init.xavier_uniform_(self.lr_att.weight, gain=gain)
         nn.init.zeros_(self.lr_att.bias)
         nn.init.xavier_uniform_(self.res_fc.weight, gain=gain)
-        nn.init.zeros_(self.res_fc.bias)          
+        nn.init.zeros_(self.res_fc.bias)
         self.lr_output.reset_parameters()
         if self.pre_process:
-            for layer in self.process:             
+            for layer in self.process:
                 layer.reset_parameters()
     def forward(self, feature_list):
         num_node=feature_list[0].shape[0]
@@ -243,11 +249,11 @@ class R_GAMLP_RDD(nn.Module): #recursive GAMLP
             right_1 = right_1 + torch.mul(input_list[i],self.att_drop(attention_scores[:, i].view(num_node, 1)))
         if self.residual:
             right_1 +=self.res_fc(feature_list[0])
-            right_1 = self.dropout(self.prelu(right_1))            
+            right_1 = self.dropout(self.prelu(right_1))
         right_1 = self.lr_output(right_1)
-        right_1 += self.label_fc(self.label_drop(label_emb))     
+        right_1 += self.label_fc(self.label_drop(label_emb))
         return right_1
-#adapt from https://github.com/facebookresearch/NARS/blob/main/model.py 
+#adapt from https://github.com/facebookresearch/NARS/blob/main/model.py
 class WeightedAggregator(nn.Module):
     def __init__(self, num_feats, in_feats, num_hops):
         super(WeightedAggregator, self).__init__()
@@ -261,16 +267,16 @@ class WeightedAggregator(nn.Module):
             new_feats.append((concat_feat * weight.unsqueeze(0)).sum(dim=1).squeeze())
         return new_feats
 class NARS_JK_GAMLP(nn.Module):
-       def __init__(self, nfeat, hidden, nclass, num_hops,label_in_feats,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,,pre_process=False,residual=False):
+       def __init__(self, nfeat, hidden, nclass, num_hops,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,pre_process=False,residual=False):
            super(NARS_JK_GAMLP, self).__init__()
            self.aggregator = WeightedAggregator(num_feats, in_feats, num_hops)
-           self.model=JK_GAMLP(nfeat,nclass, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
+           self.model=JK_GAMLP(nfeat, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
        def forward(self, feats_dict, label_emb):
            feats = self.aggregator(feats_dict)
            out1 = self.model(feats, label_emb)
            return out1
 class NARS_R_GAMLP(nn.Module):
-       def __init__(self, nfeat, hidden, nclass, num_hops,label_in_feats,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,,pre_process=False,residual=False):
+       def __init__(self, nfeat, hidden, nclass, num_hops,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,pre_process=False,residual=False):
            super(NARS_R_GAMLP, self).__init__()
            self.aggregator = WeightedAggregator(num_feats, in_feats, num_hops)
            self.model=R_GAMLP(nfeat, hidden, nclass,num_hops,dropout, input_drop,attn_drop,alpha,n_layers_1,n_layers_2,pre_process,residual)
@@ -280,20 +286,20 @@ class NARS_R_GAMLP(nn.Module):
            return out1
 
 class NARS_JK_GAMLP_RDD(nn.Module):
-       def __init__(self, nfeat, hidden, nclass, num_hops,label_in_feats,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,,pre_process=False,residual=False):
+       def __init__(self, nfeat, hidden, nclass, num_hops,label_in_feats,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,pre_process=False,residual=False):
            super(NARS_JK_GAMLP_RDD, self).__init__()
            self.aggregator = WeightedAggregator(num_feats, in_feats, num_hops)
-           self.model=JK_GAMLP_RDD(nfeat,label_in_feats, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
+           self.model=JK_GAMLP_RDD(nfeat, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
        def forward(self, feats_dict, label_emb):
            feats = self.aggregator(feats_dict)
            out1 = self.model(feats, label_emb)
            return out1
 
 class NARS_R_GAMLP_RDD(nn.Module):
-       def __init__(self, nfeat, hidden, nclass, num_hops,label_in_feats,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,,pre_process=False,residual=False):
+       def __init__(self, nfeat, hidden, nclass, num_hops,num_feats,alpha,n_layers_1,n_layers_2,n_layers_3,act="relu",dropout=0.5, input_drop=0.0, attn_drop=0.0,label_drop=0.0,pre_process=False,residual=False):
            super(NARS_R_GAMLP_RDD, self).__init__()
            self.aggregator = WeightedAggregator(num_feats, in_feats, num_hops)
-           self.model=R_GAMLP_RDD(nfeat,label_in_feats, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
+           self.model=R_GAMLP_RDD(nfeat, hidden, nclass,num_hops,dropout, input_drop,attn_drop,label_drop,alpha,n_layers_1,n_layers_2,n_layers_3,pre_process,residual)
        def forward(self, feats_dict, label_emb):
            feats = self.aggregator(feats_dict)
            out1 = self.model(feats, label_emb)

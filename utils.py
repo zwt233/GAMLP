@@ -11,7 +11,7 @@ from torch.nn.parameter import Parameter
 import math
 import uuid
 import random
-from model import R_GAMLP,JK_GAMLP,NARS_JK_GAMLP,NARS_R_GAMLP,R_GAMLP_RDD,JK_GAMLP_RDD,NARS_JK_GAMLP_RDD,NARS_R_GAMLP_RDD,
+from model import R_GAMLP,JK_GAMLP,NARS_JK_GAMLP,NARS_R_GAMLP,R_GAMLP_RDD,JK_GAMLP_RDD,NARS_JK_GAMLP_RDD,NARS_R_GAMLP_RDD
 
 def gen_model_mag(args,num_feats,in_feats,num_classes):
     if args.method=="R_GAMLP":
@@ -28,18 +28,18 @@ def gen_model_mag_RDD(args,num_feats,in_feats,num_classes):
 def gen_model(args,in_size,num_classes):
     if args.method=="R_GAMLP":
         return R_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)    
+                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
     elif args.method=="JK_GAMLP":
         return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)   
+                 args.dropout, args.input_drop,args.att_dropout,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
 
 def gen_model_rdd(args,in_size,num_classes):
     if args.method=="R_GAMLP_RDD":
         return R_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)    
+                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
     elif args.method=="JK_GAMLP_RDD":
         return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)    
+                 args.dropout, args.input_drop,args.att_dropout,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layer_3,args.act,args.pre_process,args.residual)
 
 def set_seed(seed=0):
     random.seed(seed)
@@ -72,7 +72,7 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
         total_loss += loss
         iter_num += 1
 
-    loss = total_loss / iter_num 
+    loss = total_loss / iter_num
     approx_acc = evaluator.eval({
         'y_true': torch.cat(y_true, dim=0),
         'y_pred': torch.cat(y_pred, dim=0)
@@ -89,10 +89,10 @@ def train(model, feats, labels, loss_fcn, optimizer, train_loader):
         output_att=model(batch_feats)
         L1 = loss_fcn(output_att, labels[batch])
         loss_train = L1
-        total_loss += loss_train 
+        total_loss += loss_train
         optimizer.zero_grad()
         loss_train.backward()
-        optimizer.step()   
+        optimizer.step()
 @torch.no_grad()
 def val(model, feats, labels, val_loader, evaluator,
          val_nid):
@@ -105,7 +105,7 @@ def val(model, feats, labels, val_loader, evaluator,
     preds = torch.cat(preds, dim=0)
     val_res = evaluator(preds, labels[val_nid])
     return val_res
-@torch.no_grad()        
+@torch.no_grad()
 def test(model, feats, labels, test_loader, evaluator,
          train_nid, val_nid, test_nid):
     model.eval()
