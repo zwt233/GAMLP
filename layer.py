@@ -32,15 +32,18 @@ class Dense(nn.Module):
         if self.in_features == self.out_features:
             output = output + input
         return output
+
+
 # MLP apply initial residual
 class GraphConvolution(nn.Module):
-    def __init__(self, in_features, out_features,alpha):
+    def __init__(self, in_features, out_features,alpha,bns=False):
         super(GraphConvolution, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.weight = Parameter(torch.FloatTensor(self.in_features,self.out_features))
         self.alpha=alpha
         self.reset_parameters()
+        self.bns=bns
         self.bias = nn.BatchNorm1d(out_features)
     def reset_parameters(self):
         stdv = 1. / math.sqrt(self.out_features)
@@ -49,10 +52,12 @@ class GraphConvolution(nn.Module):
     def forward(self, input ,h0):
         support = (1-self.alpha)*input+self.alpha*h0
         output = torch.mm(support, self.weight)
-        output=self.bias(output)
+        if self.bns:
+           output=self.bias(output)
         if self.in_features==self.out_features:
             output = output+input
         return output
+
 
 # adapted from dgl sign
 class FeedForwardNet(nn.Module):
@@ -89,7 +94,7 @@ class FeedForwardNet(nn.Module):
 
 
 class FeedForwardNetII(nn.Module):
-    def __init__(self, in_feats, hidden, out_feats, n_layers, dropout,alpha):
+    def __init__(self, in_feats, hidden, out_feats, n_layers, dropout,alpha,bns=False):
         super(FeedForwardNetII, self).__init__()
         self.layers = nn.ModuleList()
         self.n_layers = n_layers
@@ -101,7 +106,7 @@ class FeedForwardNetII(nn.Module):
         else:
             self.layers.append(Dense(in_feats, hidden))
             for i in range(n_layers - 2):
-                self.layers.append(GraphConvolution(hidden, hidden,alpha))
+                self.layers.append(GraphConvolution(hidden, hidden,alpha,bns))
             self.layers.append(Dense(hidden, out_feats))
 
         self.prelu = nn.PReLU()
@@ -122,5 +127,5 @@ class FeedForwardNetII(nn.Module):
             else:
                 x = self.dropout(self.prelu(x))
                 x = layer(x,h0)
-#                x = self.dropout(self.prelu(x))
+                #x = self.dropout(self.prelu(x))
         return x

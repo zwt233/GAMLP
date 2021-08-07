@@ -15,32 +15,37 @@ from model import R_GAMLP,JK_GAMLP,NARS_JK_GAMLP,NARS_R_GAMLP,R_GAMLP_RDD,JK_GAM
 
 def gen_model_mag(args,num_feats,in_feats,num_classes):
     if args.method=="R_GAMLP":
-        return NARS_R_GAMLP(in_feats, hidden, num_classes, args.num_hops+1,num_classes,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual)
+        # error
+        return NARS_R_GAMLP(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
     elif args.method=="JK_GAMLP":
-        return NARS_JK_GAMLP(in_feats, hidden, num_classes, args.num_hops+1,num_classes,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual)
+        return NARS_JK_GAMLP(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
+
 
 def gen_model_mag_rdd(args,num_feats,in_feats,num_classes):
     if args.method=="R_GAMLP":
-        return NARS_R_GAMLP_RDD(in_feats, hidden, num_classes, args.num_hops+1,num_classes,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual)
+        return NARS_R_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
     elif args.method=="JK_GAMLP":
-        return NARS_JK_GAMLP_RDD(in_feats, hidden, num_classes, args.num_hops+1,num_classes,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual)
+        return NARS_JK_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
+
 
 def gen_model(args,in_size,num_classes):
     if args.method=="R_GAMLP":
         return R_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
+                 args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
     elif args.method=="JK_GAMLP":
         return JK_GAMLP(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual)
+                 args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
+
 
 def gen_model_rdd(args,in_size,num_classes):
     if args.method=="R_GAMLP_RDD":
         return R_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
+                 args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
     elif args.method=="JK_GAMLP_RDD":
         return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
-                 args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual)
+                 args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
+
 
 def set_seed(seed=0):
     random.seed(seed)
@@ -51,6 +56,8 @@ def set_seed(seed=0):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     dgl.random.seed(seed)
+
+
 def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, xs, labels, label_emb, predict_prob):
     model.train()
     loss_fcn = nn.CrossEntropyLoss()
@@ -63,7 +70,7 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
         y = labels[idx_1].to(torch.long).to(device)
         optimizer.zero_grad()
         output_att= model(feat_list, label_emb[idx].to(device))
-        L1 = loss_fcn(output_att[:len(idx_1)],  y.squeeze(1))
+        L1 = loss_fcn(output_att[:len(idx_1)],  y)
         L2 = F.kl_div(F.log_softmax(output_att[len(idx_1):], dim=1), predict_prob[idx_2].to(device), reduction='batchmean')
         loss = L1 + L2
         loss.backward()
@@ -74,12 +81,10 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
         iter_num += 1
 
     loss = total_loss / iter_num
-    approx_acc = evaluator.eval({
-        'y_true': torch.cat(y_true, dim=0),
-        'y_pred': torch.cat(y_pred, dim=0)
-    })['acc']
+    approx_acc = evaluator(torch.cat(y_true, dim=0),torch.cat(y_pred, dim=0))
     #print(f'Epoch:{epoch:.4f}, Loss:{loss:.4f}, Train acc:{approx_acc:.4f}')
     return loss, approx_acc
+
 
 def train(model, feats, labels, loss_fcn, optimizer, train_loader,label_emb):
     model.train()
@@ -94,23 +99,10 @@ def train(model, feats, labels, loss_fcn, optimizer, train_loader,label_emb):
         optimizer.zero_grad()
         loss_train.backward()
         optimizer.step()
+
+
 @torch.no_grad()
-def val(model, feats, labels, val_loader, evaluator,label_emb):
-    model.eval()
-    device = labels.device
-    preds = []
-    true=[]
-    for batch in val_loader:
-        batch_feats = [feat[batch].to(device) for feat in feats]
-        preds.append(torch.argmax(model(batch_feats,label_emb[batch].to(device)), dim=-1))
-        true.append(labels[batch])
-    preds = torch.cat(preds, dim=0)
-    true=torch.cat(true,dim=0)
-    val_res = evaluator(preds, true)
-    return val_res
-@torch.no_grad()
-def test(model, feats, labels, test_loader, evaluator,
-         train_nid, val_nid, test_nid,label_emb):
+def test(model, feats, labels, test_loader, evaluator, label_emb):
     model.eval()
     device = labels.device
     preds = []
@@ -124,12 +116,25 @@ def test(model, feats, labels, test_loader, evaluator,
     res = evaluator(preds, true)
 
     return res
+
+
 @torch.no_grad()
-def gen_output(model, feats, test_loader,device,label_emb):
+def gen_output_numpy(model, feats, test_loader, device, label_emb):
     model.eval()
     preds = []
     for batch in test_loader:
         batch_feats = [feat[batch].to(device) for feat in feats]
         preds.append(model(batch_feats,label_emb[batch].to(device)).cpu().numpy())
     preds = np.concatenate(preds, axis=0)
+    return preds
+
+
+@torch.no_grad()
+def gen_output_torch(model, feats, test_loader, device, label_emb):
+    model.eval()
+    preds = []
+    for batch in test_loader:
+        batch_feats = [feat[batch].to(device) for feat in feats]
+        preds.append(model(batch_feats,label_emb[batch].to(device)).softmax(dim=1).cpu())
+    preds = torch.cat(preds, dim=0)
     return preds
