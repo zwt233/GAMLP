@@ -1,4 +1,4 @@
-## Graph Attention Multi-Layer Perceptron
+# Graph Attention Multi-Layer Perceptron
 
 ### Environments
 
