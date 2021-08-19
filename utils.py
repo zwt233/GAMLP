@@ -58,7 +58,7 @@ def set_seed(seed=0):
     dgl.random.seed(seed)
 
 
-def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, xs, labels, label_emb, predict_prob):
+def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, xs, labels, label_emb, predict_prob,gama):
     model.train()
     loss_fcn = nn.CrossEntropyLoss()
     y_true, y_pred = [], []
@@ -70,9 +70,19 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
         y = labels[idx_1].to(torch.long).to(device)
         optimizer.zero_grad()
         output_att= model(feat_list, label_emb[idx].to(device))
-        L1 = loss_fcn(output_att[:len(idx_1)],  y)
-        L2 = F.kl_div(F.log_softmax(output_att[len(idx_1):], dim=1), predict_prob[idx_2].to(device), reduction='batchmean')
-        loss = L1 + L2
+        L1 = loss_fcn(output_att[:len(idx_1)],  y)*(len(idx_1)*1.0/(len(idx_1)+len(idx_2)))
+        #L2= loss_fcn(output_att[len(idx_1):],predict_prob[idx_2].argmax(dim=1).to(torch.long).to(device))*(len(idx_2)*1.0/(len(idx_1)+len(idx_2)))
+
+        #teacher_pred = F.one_hot(predict_prob[idx_2].argmax(dim=1).to(torch.long), num_classes=predict_prob.shape[1]).to(device)
+        teacher_soft = predict_prob[idx_2].to(device)
+        teacher_prob = torch.max(teacher_soft, dim=1, keepdim=True)[0]
+        #L3 = (-teacher_pred*teacher_soft*torch.log_softmax(output_att[len(idx_1):], dim=1)).sum(1).mean()
+       
+        L3 = (teacher_prob*(teacher_soft*(torch.log(teacher_soft+1e-8)-torch.log_softmax(output_att[len(idx_1):], dim=1)))).sum(1).mean()*(len(idx_2)*1.0/(len(idx_1)+len(idx_2)))
+        
+        #print(L3)
+        #L2 = F.kl_div(F.log_softmax(output_att[len(idx_1):], dim=1), predict_prob[idx_2].to(device), reduction='batchmean')
+        loss = L1 + L3*gama
         loss.backward()
         optimizer.step()
         y_true.append(labels[idx_1].to(torch.long))
@@ -86,20 +96,28 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
     return loss, approx_acc
 
 
-def train(model, feats, labels, loss_fcn, optimizer, train_loader,label_emb):
+def train(model, feats, labels, loss_fcn, optimizer, train_loader,label_emb,evaluator):
     model.train()
     device = labels.device
     total_loss = 0
+    iter_num=0
+    y_true=[]
+    y_pred=[]
     for batch in train_loader:
         batch_feats = [x[batch].to(device) for x in feats]
         output_att=model(batch_feats,label_emb[batch].to(device))
+        y_true.append(labels[batch].to(torch.long))
+        y_pred.append(output_att.argmax(dim=-1, keepdim=True).cpu())
         L1 = loss_fcn(output_att, labels[batch])
         loss_train = L1
-        total_loss += loss_train
+        total_loss = loss_train
         optimizer.zero_grad()
         loss_train.backward()
         optimizer.step()
-
+        iter_num+=1
+    loss = total_loss / iter_num
+    acc = evaluator(torch.cat(y_true, dim=0),torch.cat(y_pred, dim=0))
+    return loss,acc
 
 @torch.no_grad()
 def test(model, feats, labels, test_loader, evaluator, label_emb):
@@ -135,6 +153,6 @@ def gen_output_torch(model, feats, test_loader, device, label_emb):
     preds = []
     for batch in test_loader:
         batch_feats = [feat[batch].to(device) for feat in feats]
-        preds.append(model(batch_feats,label_emb[batch].to(device)).softmax(dim=1).cpu())
+        preds.append(model(batch_feats,label_emb[batch].to(device)).cpu())
     preds = torch.cat(preds, dim=0)
     return preds

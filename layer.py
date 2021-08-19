@@ -52,8 +52,8 @@ class GraphConvolution(nn.Module):
     def forward(self, input ,h0):
         support = (1-self.alpha)*input+self.alpha*h0
         output = torch.mm(support, self.weight)
-        if self.bns:
-           output=self.bias(output)
+        #if self.bns:
+        output=self.bias(output)
         if self.in_features==self.out_features:
             output = output+input
         return output
@@ -61,7 +61,7 @@ class GraphConvolution(nn.Module):
 
 # adapted from dgl sign
 class FeedForwardNet(nn.Module):
-    def __init__(self, in_feats, hidden, out_feats, n_layers, dropout):
+    def __init__(self, in_feats, hidden, out_feats, n_layers, dropout,bns=True):
         super(FeedForwardNet, self).__init__()
         self.layers = nn.ModuleList()
         self.bns = nn.ModuleList()
@@ -78,6 +78,7 @@ class FeedForwardNet(nn.Module):
         if self.n_layers > 1:
             self.prelu = nn.PReLU()
             self.dropout = nn.Dropout(dropout)
+        self.norm=bns
         self.reset_parameters()
     def reset_parameters(self):
         gain = nn.init.calculate_gain("relu")
@@ -88,8 +89,11 @@ class FeedForwardNet(nn.Module):
     def forward(self, x):
         for layer_id, layer in enumerate(self.layers):
             x = layer(x)
-            if layer_id < self.n_layers - 1:
-                x = self.dropout(self.prelu(self.bns[layer_id](x)))
+            if layer_id < self.n_layers -1: 
+                if self.norm:
+                    x = self.dropout(self.prelu(self.bns[layer_id](x)))
+                else:
+                    x = self.dropout(self.prelu(x))
         return x
 
 

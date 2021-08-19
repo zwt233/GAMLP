@@ -33,7 +33,8 @@ def run(args, device):
 
     for stage, epochs in enumerate(args.stages):
         if stage > 0 and args.use_rdd:
-            predict_prob = torch.load(checkpt_file+'_{}.pt'.format(stage-1))
+            predict_prob= torch.load(checkpt_file+'_{}.pt'.format(stage-1))/args.temp
+            predict_prob = predict_prob.softmax(dim=1)
             train_node_nums=len(train_nid)
             valid_node_nums=len(val_nid)
             test_node_nums=len(test_nid)
@@ -43,11 +44,10 @@ def run(args, device):
             print("This history model Valid ACC is {}".format(evaluator(labels[train_node_nums:train_node_nums+valid_node_nums],predict_prob[train_node_nums:train_node_nums+valid_node_nums].argmax(dim=-1, keepdim=True).cpu())))
 
             print("This history model Test ACC is {}".format(evaluator(labels[train_node_nums+valid_node_nums:train_node_nums+valid_node_nums+test_node_nums],predict_prob[train_node_nums+valid_node_nums:train_node_nums+valid_node_nums+test_node_nums].argmax(dim=-1, keepdim=True).cpu())))
-            #tr_va_te_nid = torch.arange(total_num_nodes)
             confident_nid = torch.arange(len(predict_prob))[
                     predict_prob.max(1)[0] > args.threshold]
             extra_confident_nid = confident_nid[confident_nid >= len(
-                    train_nid)]
+                    train_nid)]            
             print(f'Stage: {stage}, confident nodes: {len(extra_confident_nid)}')
             enhance_idx = extra_confident_nid
             if len(extra_confident_nid) > 0:
@@ -55,7 +55,7 @@ def run(args, device):
                         enhance_idx, batch_size=int(args.batch_size*len(enhance_idx)/(len(enhance_idx)+len(train_nid))), shuffle=True, drop_last=False)
                 gc.collect()
             teacher_probs = torch.zeros(predict_prob.shape[0], predict_prob.shape[1])
-            teacher_probs[enhance_idx,:] = predict_prob[enhance_idx,:]
+            teacher_probs[enhance_idx,:] =   predict_prob[enhance_idx,:]         
         else:
             teacher_probs = None
 
@@ -117,18 +117,20 @@ def run(args, device):
             gc.collect()
             start = time.time()
             if stage == 0:
-                train(model, feats, labels, loss_fcn, optimizer, train_loader, label_emb)
-            elif stage > 0:
-                train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob)
+                loss,acc=train(model, feats, labels, loss_fcn, optimizer, train_loader, label_emb,evaluator)
+            elif stage == 1:
+                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,1)
+            else:
+                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb    , predict_prob,1)
             end = time.time()
 
-            log = "Epoch {}, Time(s): {:.4f}, ".format(epoch, end - start)
+            log = "Epoch {}, Time(s): {:.4f},Train loss: {:.4f}, Train acc: {:.4f} ".format(epoch, end - start,loss,acc*100)
             if epoch % args.eval_every == 0 and epoch > args.train_num_epochs[stage]:
                 with torch.no_grad():
                     acc = test(model, feats, labels, val_loader, evaluator,
                             label_emb)
                 end = time.time()
-                log = "Epoch {}, Time(s): {:.4f}, ".format(epoch, end - start)
+                log += "Epoch {}, Time(s): {:.4f}, ".format(epoch, end - start)
                 log += "Val {:.4f}, ".format(acc)
                 if acc > best_val:
                     best_epoch = epoch
@@ -153,10 +155,7 @@ def run(args, device):
         model.load_state_dict(torch.load(checkpt_file+f'_{stage}.pkl'))
         preds = gen_output_torch(model, feats, all_loader, labels.device, label_emb)
         torch.save(preds, checkpt_file+f'_{stage}.pt')
-
     return best_val, best_test, preds
-
-
 def main(args):
     if args.gpu < 0:
         device = "cpu"
@@ -209,6 +208,8 @@ if __name__ == "__main__":
     parser.add_argument("--patience", type=int, default=100,
                         help="early stop of times of the experiment")
     parser.add_argument("--alpha", type=float, default=0.5,
+                        help="initial residual parameter for the model")
+    parser.add_argument("--temp", type=float, default=1,
                         help="initial residual parameter for the model")
     parser.add_argument("--threshold", type=float, default=0.8,
                         help="initial residual parameter for the model")

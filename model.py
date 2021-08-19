@@ -12,7 +12,7 @@ class R_GAMLP(nn.Module):  # recursive GAMLP
             self.lr_output = FeedForwardNetII(
                 hidden, hidden, nclass, n_layers_2, dropout, alpha,bns)
             self.process = nn.ModuleList(
-                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout) for i in range(num_hops)])
+                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout, bns) for i in range(num_hops)])
         else:
             self.lr_att = nn.Linear(nfeat + nfeat, 1)
             self.lr_output = FeedForwardNetII(
@@ -97,7 +97,7 @@ class JK_GAMLP(nn.Module):
             self.lr_output = FeedForwardNetII(
                 hidden, hidden, nclass, n_layers_2, dropout, alpha, bns)
             self.process = nn.ModuleList(
-                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout) for i in range(num_hops)])
+                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout,bns) for i in range(num_hops)])
         else:
             self.lr_jk_ref = FeedForwardNetII(
                 num_hops*nfeat, hidden, hidden, n_layers_1, dropout, alpha, bns)
@@ -175,7 +175,7 @@ class JK_GAMLP_RDD(nn.Module):
             self.lr_output = FeedForwardNetII(
                 hidden, hidden, nclass, n_layers_2, dropout, alpha, bns)
             self.process = nn.ModuleList(
-                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout) for i in range(num_hops)])
+                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout,bns) for i in range(num_hops)])
         else:
             self.lr_jk_ref = FeedForwardNetII(
                 num_hops*nfeat, hidden, hidden, n_layers_1, dropout, alpha, bns)
@@ -250,7 +250,7 @@ class R_GAMLP_RDD(nn.Module):  # recursive GAMLP
             self.lr_output = FeedForwardNetII(
                 hidden, hidden, nclass, n_layers_2, dropout, alpha, bns)
             self.process = nn.ModuleList(
-                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout) for i in range(num_hops)])
+                [FeedForwardNet(nfeat, hidden, hidden, 2, dropout,bns) for i in range(num_hops)])
         else:
             self.lr_att = nn.Linear(nfeat + nfeat, 1)
             self.lr_output = FeedForwardNetII(
