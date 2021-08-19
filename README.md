@@ -1,10 +1,10 @@
 # Graph Attention Multi-Layer Perceptron
 
-### Environments
+## Environments
 
 Implementing environment: Xeon(R) Platinum 8255C (CPU), 376GB(RAM), Tesla V100 32GB (GPU), Ubuntu 16.04 (OS).
 
-### Requirements
+## Requirements
 
 Experimenting environments: Xeon(R) Platinum 8255C (CPU), 376GB(RAM), Tesla V100 32GB (GPU), Ubuntu 16.04 (OS)
 
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 
 
-### Training
+## Training
 
 To reproduce the results of **GAMLP+RDE** on OGB datasets, please run following commands.
 
@@ -42,7 +42,7 @@ python main.py --use-rdd --method JK_GAMLP_RDD --stages 250 200 200 200 --train-
 
 
 
-### Node Classification Results:
+## Node Classification Results:
 
 Performance comparison on **ogbn-products**:
 
