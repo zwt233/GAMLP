@@ -23,7 +23,7 @@ To reproduce the results of **GAMLP+RDE** on OGB datasets, please run following 
 For **ogbn-products**:
 
 ```bash
-python main.py --use-rdd --method R_GAMLP_RDD --stages 400 300 300 300 --train-num-epochs 0 0 0 0 --threshold 0.85 --input-drop 0.2 --att-drop 0.5 --label-drop 0 --pre-process --residual --dataset ogbn-products --num-runs 10 --gpu 6 --eval 10 --act leaky_relu --batch 50000 --patience 300 --n-layers-1 4 --n-layers-2 4 --bns --gama 0.1
+python main.py --use-rdd --method R_GAMLP_RDD --stages 400 300 300 300 --train-num-epochs 0 0 0 0 --threshold 0.85 --input-drop 0.2 --att-drop 0.5 --label-drop 0 --pre-process --residual --dataset ogbn-products --num-runs 10 --eval 10 --act leaky_relu --batch 50000 --patience 300 --n-layers-1 4 --n-layers-2 4 --bns --gama 0.1
 ```
 
 For **ogbn-papers100M**:
