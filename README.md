@@ -6,8 +6,6 @@ Implementing environment: Xeon(R) Platinum 8255C (CPU), 376GB(RAM), Tesla V100 3
 
 ## Requirements
 
-Experimenting environments: Xeon(R) Platinum 8255C (CPU), 376GB(RAM), Tesla V100 32GB (GPU), Ubuntu 16.04 (OS)
-
 The PyTorch version we use is torch 1.7.1+cu101. Please refer to the official website -- https://pytorch.org/get-started/locally/ -- for the detailed installation instructions.
 
 To install other requirements:
