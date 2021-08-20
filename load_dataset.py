@@ -196,7 +196,7 @@ def prepare_data(device, args, teacher_probs):
         feat=g.ndata.pop('feat')
     gc.collect()
     label_emb = None
-    if args.use_rdd:
+    if args.use_rlu:
         label_emb = prepare_label_emb(args, g, labels, n_classes, train_nid, val_nid, test_nid, teacher_probs)
     # move to device
     if args.dataset=='ogbn-papers100M':

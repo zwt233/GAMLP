@@ -238,7 +238,7 @@ class JK_GAMLP_RLU(nn.Module):
         return right_1
 
 
-class R_GAML_RLU(nn.Module):  # recursive GAMLP
+class R_GAMLP_RLU(nn.Module):  # recursive GAMLP
     def __init__(self, nfeat, hidden, nclass, num_hops,
                  dropout, input_drop, att_dropout, label_drop, alpha, n_layers_1, n_layers_2, n_layers_3, act, pre_process=False, residual=False,pre_dropout=False,bns=False):
         super(R_GAMLP_RLU, self).__init__()
