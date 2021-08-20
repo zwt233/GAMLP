@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ```
 ## preprocess
 
-To generate the Complex embedding of ogbn-mag, we provide the bash command in the ./data/, you can follow the instruction in the https://github.com/facebookresearch/NARS
+To generate the ComplEx embedding of ogbn-mag, we provide the bash command in the ./data/, you can follow the instruction in the https://github.com/facebookresearch/NARS
 
 To generate the embedding of ogbn-papers100M, we also provide python script in the ./data/ folder. You can do the feature process before training.
 
