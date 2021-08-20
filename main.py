@@ -119,9 +119,9 @@ def run(args, device):
             if stage == 0:
                 loss,acc=train(model, feats, labels, loss_fcn, optimizer, train_loader, label_emb,evaluator)
             elif stage == 1:
-                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,1)
+                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
             else:
-                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb    , predict_prob,1)
+                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
             end = time.time()
 
             log = "Epoch {}, Time(s): {:.4f},Train loss: {:.4f}, Train acc: {:.4f} ".format(epoch, end - start,loss,acc*100)
@@ -210,19 +210,21 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", type=float, default=0.5,
                         help="initial residual parameter for the model")
     parser.add_argument("--temp", type=float, default=1,
-                        help="initial residual parameter for the model")
+                        help="temperature of the output prediction")
     parser.add_argument("--threshold", type=float, default=0.8,
-                        help="initial residual parameter for the model")
+                        help="the threshold for the node to be added into the model")
     parser.add_argument("--input-drop", type=float, default=0,
                         help="input dropout of input features")
     parser.add_argument("--att-drop", type=float, default=0.5,
                         help="attention dropout of model")
     parser.add_argument("--label-drop", type=float, default=0.5,
-                        help="attention dropout of model")
+                        help="label feature dropout of model")
+    parser.add_argument("--gama", type=float, default=0.5,
+                        help="parameter for the KL loss")                        
     parser.add_argument("--pre-process", action='store_true', default=False,
                         help="whether to process the input features")
     parser.add_argument("--residual", action='store_true', default=False,
-                        help="whether to process the input features")
+                        help="whether to connect the input features")
     parser.add_argument("--act", type=str, default="relu",
                         help="the activation function of the model")
     parser.add_argument("--method", type=str, default="JK_GAMLP",

@@ -22,9 +22,9 @@ def gen_model_mag(args,num_feats,in_feats,num_classes):
 
 
 def gen_model_mag_rdd(args,num_feats,in_feats,num_classes):
-    if args.method=="R_GAMLP":
+    if args.method=="R_GAMLP_RDD":
         return NARS_R_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
-    elif args.method=="JK_GAMLP":
+    elif args.method=="JK_GAMLP_RDD":
         return NARS_JK_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
 
@@ -71,17 +71,9 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
         optimizer.zero_grad()
         output_att= model(feat_list, label_emb[idx].to(device))
         L1 = loss_fcn(output_att[:len(idx_1)],  y)*(len(idx_1)*1.0/(len(idx_1)+len(idx_2)))
-        #L2= loss_fcn(output_att[len(idx_1):],predict_prob[idx_2].argmax(dim=1).to(torch.long).to(device))*(len(idx_2)*1.0/(len(idx_1)+len(idx_2)))
-
-        #teacher_pred = F.one_hot(predict_prob[idx_2].argmax(dim=1).to(torch.long), num_classes=predict_prob.shape[1]).to(device)
         teacher_soft = predict_prob[idx_2].to(device)
         teacher_prob = torch.max(teacher_soft, dim=1, keepdim=True)[0]
-        #L3 = (-teacher_pred*teacher_soft*torch.log_softmax(output_att[len(idx_1):], dim=1)).sum(1).mean()
-       
         L3 = (teacher_prob*(teacher_soft*(torch.log(teacher_soft+1e-8)-torch.log_softmax(output_att[len(idx_1):], dim=1)))).sum(1).mean()*(len(idx_2)*1.0/(len(idx_1)+len(idx_2)))
-        
-        #print(L3)
-        #L2 = F.kl_div(F.log_softmax(output_att[len(idx_1):], dim=1), predict_prob[idx_2].to(device), reduction='batchmean')
         loss = L1 + L3*gama
         loss.backward()
         optimizer.step()
@@ -92,7 +84,6 @@ def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device,
 
     loss = total_loss / iter_num
     approx_acc = evaluator(torch.cat(y_true, dim=0),torch.cat(y_pred, dim=0))
-    #print(f'Epoch:{epoch:.4f}, Loss:{loss:.4f}, Train acc:{approx_acc:.4f}')
     return loss, approx_acc
 
 
@@ -134,18 +125,6 @@ def test(model, feats, labels, test_loader, evaluator, label_emb):
     res = evaluator(preds, true)
 
     return res
-
-
-@torch.no_grad()
-def gen_output_numpy(model, feats, test_loader, device, label_emb):
-    model.eval()
-    preds = []
-    for batch in test_loader:
-        batch_feats = [feat[batch].to(device) for feat in feats]
-        preds.append(model(batch_feats,label_emb[batch].to(device)).cpu().numpy())
-    preds = np.concatenate(preds, axis=0)
-    return preds
-
 
 @torch.no_grad()
 def gen_output_torch(model, feats, test_loader, device, label_emb):
