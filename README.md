@@ -13,7 +13,11 @@ To install other requirements:
 ```setup
 pip install -r requirements.txt
 ```
+## preprocess
 
+To generate the Complex embedding of ogbn-mag, we provide the bash command in the ./data/, you can follow the instruction in the https://github.com/facebookresearch/NARS
+
+To generate the embedding of ogbn-papers100M, we also provide python script in the ./data/ folder. You can do the feature process before training.
 
 
 ## Training
@@ -33,6 +37,8 @@ For **ogbn-papers100M**:
 ###### Params: 16308751
 
 ```bash
+python ./data/preprocess_papers100m.py --num-hops 6
+
 python main.py --use-rdd --method R_GAMLP_RDD --stages 100 150 150 150 --train-num-epochs 0 0 0 0 --threshold 0 --input-drop 0 --att-drop 0 --label-drop 0 --dropout 0.5 --pre-process --dataset ogbn-papers100M --num-runs 3 --eval 1 --act sigmoid --batch 5000 --patience 300 --n-layers-2 6 --label-num-hops 9 --num-hops 6 --hidden 1024 --bns --temp 0.001
 ```
 
