@@ -22,7 +22,7 @@ To generate the embedding of ogbn-papers100M, we also provide python script in t
 
 ## Training
 
-To reproduce the results of **GAMLP+RDE** on OGB datasets, please run following commands.
+To reproduce the results of **GAMLP+RLU** on OGB datasets, please run following commands.
 
 For **ogbn-products**:
 
