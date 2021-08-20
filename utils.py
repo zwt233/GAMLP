@@ -11,7 +11,7 @@ from torch.nn.parameter import Parameter
 import math
 import uuid
 import random
-from model import R_GAMLP,JK_GAMLP,NARS_JK_GAMLP,NARS_R_GAMLP,R_GAMLP_RDD,JK_GAMLP_RDD,NARS_JK_GAMLP_RDD,NARS_R_GAMLP_RDD
+from model import R_GAMLP,JK_GAMLP,NARS_JK_GAMLP,NARS_R_GAMLP,R_GAMLP_RLU,JK_GAMLP_RLU,NARS_JK_GAMLP_RLU,NARS_R_GAMLP_RLU
 
 def gen_model_mag(args,num_feats,in_feats,num_classes):
     if args.method=="R_GAMLP":
@@ -21,11 +21,11 @@ def gen_model_mag(args,num_feats,in_feats,num_classes):
         return NARS_JK_GAMLP(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
 
-def gen_model_mag_rdd(args,num_feats,in_feats,num_classes):
-    if args.method=="R_GAMLP_RDD":
-        return NARS_R_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
-    elif args.method=="JK_GAMLP_RDD":
-        return NARS_JK_GAMLP_RDD(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
+def gen_model_mag_rlu(args,num_feats,in_feats,num_classes):
+    if args.method=="R_GAMLP_RLU":
+        return NARS_R_GAMLP_RLU(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
+    elif args.method=="JK_GAMLP_RLU":
+        return NARS_JK_GAMLP_RLU(in_feats, args.hidden, num_classes, args.num_hops+1,num_feats,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.dropout, args.input_drop, args.att_drop,args.label_drop,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
 
 def gen_model(args,in_size,num_classes):
@@ -37,13 +37,13 @@ def gen_model(args,in_size,num_classes):
                  args.dropout, args.input_drop,args.att_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
 
-def gen_model_rdd(args,in_size,num_classes):
-    if args.method=="R_GAMLP_RDD":
-        return R_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
+def gen_model_rlu(args,in_size,num_classes):
+    if args.method=="R_GAMLP_RLU":
+        return R_GAMLP_RLU(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
-    elif args.method=="JK_GAMLP_RDD":
-        return JK_GAMLP_RDD(in_size, args.hidden, num_classes,args.num_hops+1,
+    elif args.method=="JK_GAMLP_RLU":
+        return JK_GAMLP_RLU(in_size, args.hidden, num_classes,args.num_hops+1,
                  args.dropout, args.input_drop,args.att_drop,args.label_drop,args.alpha,args.n_layers_1,args.n_layers_2,args.n_layers_3,args.act,args.pre_process,args.residual,args.pre_dropout,args.bns)
 
 
@@ -58,7 +58,7 @@ def set_seed(seed=0):
     dgl.random.seed(seed)
 
 
-def train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, xs, labels, label_emb, predict_prob,gama):
+def train_rlu(model, train_loader, enhance_loader, optimizer, evaluator, device, xs, labels, label_emb, predict_prob,gama):
     model.train()
     loss_fcn = nn.CrossEntropyLoss()
     y_true, y_pred = [], []

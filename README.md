@@ -29,7 +29,7 @@ For **ogbn-products**:
 ###### Params: 3335831
 
 ```bash
-python main.py --use-rdd --method R_GAMLP_RDD --stages 400 300 300 300 --train-num-epochs 0 0 0 0 --threshold 0.85 --input-drop 0.2 --att-drop 0.5 --label-drop 0 --pre-process --residual --dataset ogbn-products --num-runs 10 --eval 10 --act leaky_relu --batch 50000 --patience 300 --n-layers-1 4 --n-layers-2 4 --bns --gama 0.1
+python main.py --use-rlu --method R_GAMLP_RLU --stages 400 300 300 300 --train-num-epochs 0 0 0 0 --threshold 0.85 --input-drop 0.2 --att-drop 0.5 --label-drop 0 --pre-process --residual --dataset ogbn-products --num-runs 10 --eval 10 --act leaky_relu --batch 50000 --patience 300 --n-layers-1 4 --n-layers-2 4 --bns --gama 0.1
 ```
 
 For **ogbn-papers100M**:
@@ -39,7 +39,7 @@ For **ogbn-papers100M**:
 ```bash
 python ./data/preprocess_papers100m.py --num-hops 6
 
-python main.py --use-rdd --method R_GAMLP_RDD --stages 100 150 150 150 --train-num-epochs 0 0 0 0 --threshold 0 --input-drop 0 --att-drop 0 --label-drop 0 --dropout 0.5 --pre-process --dataset ogbn-papers100M --num-runs 3 --eval 1 --act sigmoid --batch 5000 --patience 300 --n-layers-2 6 --label-num-hops 9 --num-hops 6 --hidden 1024 --bns --temp 0.001
+python main.py --use-rlu --method R_GAMLP_RLU --stages 100 150 150 150 --train-num-epochs 0 0 0 0 --threshold 0 --input-drop 0 --att-drop 0 --label-drop 0 --dropout 0.5 --pre-process --dataset ogbn-papers100M --num-runs 3 --eval 1 --act sigmoid --batch 5000 --patience 300 --n-layers-2 6 --label-num-hops 9 --num-hops 6 --hidden 1024 --bns --temp 0.001
 ```
 
 For **ogbn-mag**:
@@ -47,7 +47,7 @@ For **ogbn-mag**:
 ###### Params: 6734882
 
 ```bash
-python main.py --use-rdd --method JK_GAMLP_RDD --stages 250 200 200 200 --train-num-epochs 0 0 0 0 --threshold 0.4 --input-drop 0.1 --att-drop 0 --label-drop 0 --pre-process --residual --dataset ogbn-mag --num-runs 10 --eval 10 --act leaky_relu --batch 10000 --patience 300 --n-layers-1 4 --n-layers-2 4 --label-num-hops 3 --bns --gama 10 --use-relation-subsets ./data/mag --emb_path ./data/
+python main.py --use-rlu --method JK_GAMLP_RLU --stages 250 200 200 200 --train-num-epochs 0 0 0 0 --threshold 0.4 --input-drop 0.1 --att-drop 0 --label-drop 0 --pre-process --residual --dataset ogbn-mag --num-runs 10 --eval 10 --act leaky_relu --batch 10000 --patience 300 --n-layers-1 4 --n-layers-2 4 --label-num-hops 3 --bns --gama 10 --use-relation-subsets ./data/mag --emb_path ./data/
 ```
 
 

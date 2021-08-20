@@ -160,10 +160,10 @@ class JK_GAMLP(nn.Module):
         return right_1
 
 
-class JK_GAMLP_RDD(nn.Module):
+class JK_GAMLP_RLU(nn.Module):
     def __init__(self, nfeat, hidden, nclass, num_hops,
                  dropout, input_drop, att_dropout, label_drop, alpha, n_layers_1, n_layers_2, n_layers_3, act, pre_process=False, residual=False,pre_dropout=False,bns=False):
-        super(JK_GAMLP_RDD, self).__init__()
+        super(JK_GAMLP_RLU, self).__init__()
         self.num_hops = num_hops
         self.pre_dropout=pre_dropout
         self.prelu = nn.PReLU()
@@ -238,10 +238,10 @@ class JK_GAMLP_RDD(nn.Module):
         return right_1
 
 
-class R_GAMLP_RDD(nn.Module):  # recursive GAMLP
+class R_GAML_RLU(nn.Module):  # recursive GAMLP
     def __init__(self, nfeat, hidden, nclass, num_hops,
                  dropout, input_drop, att_dropout, label_drop, alpha, n_layers_1, n_layers_2, n_layers_3, act, pre_process=False, residual=False,pre_dropout=False,bns=False):
-        super(R_GAMLP_RDD, self).__init__()
+        super(R_GAMLP_RLU, self).__init__()
         self.num_hops = num_hops
         self.pre_dropout=pre_dropout
         self.prelu = nn.PReLU()
@@ -368,11 +368,11 @@ class NARS_R_GAMLP(nn.Module):
         return out1
 
 
-class NARS_JK_GAMLP_RDD(nn.Module):
+class NARS_JK_GAMLP_RLU(nn.Module):
     def __init__(self, nfeat, hidden, nclass, num_hops, num_feats, alpha, n_layers_1, n_layers_2, n_layers_3, act="relu", dropout=0.5, input_drop=0.0, attn_drop=0.0, label_drop=0.0, pre_process=False, residual=False,pre_dropout=False,bns=False):
-        super(NARS_JK_GAMLP_RDD, self).__init__()
+        super(NARS_JK_GAMLP_RLU, self).__init__()
         self.aggregator = WeightedAggregator(num_feats, nfeat, num_hops)
-        self.model = JK_GAMLP_RDD(nfeat, hidden, nclass, num_hops, dropout, input_drop, attn_drop,
+        self.model = JK_GAMLP_RLU(nfeat, hidden, nclass, num_hops, dropout, input_drop, attn_drop,
                                   label_drop, alpha, n_layers_1, n_layers_2, n_layers_3, act, pre_process, residual,pre_dropout, bns)
 
     def forward(self, feats_dict, label_emb):
@@ -381,11 +381,11 @@ class NARS_JK_GAMLP_RDD(nn.Module):
         return out1
 
 
-class NARS_R_GAMLP_RDD(nn.Module):
+class NARS_R_GAMLP_RLU(nn.Module):
     def __init__(self, nfeat, hidden, nclass, num_hops, num_feats, alpha, n_layers_1, n_layers_2, n_layers_3, act="relu", dropout=0.5, input_drop=0.0, attn_drop=0.0, label_drop=0.0, pre_process=False, residual=False,pre_dropout=False,bns=False):
-        super(NARS_R_GAMLP_RDD, self).__init__()
+        super(NARS_R_GAMLP_RLU, self).__init__()
         self.aggregator = WeightedAggregator(num_feats, nfeat, num_hops)
-        self.model = R_GAMLP_RDD(nfeat, hidden, nclass, num_hops, dropout, input_drop, attn_drop,
+        self.model = R_GAMLP_RLU(nfeat, hidden, nclass, num_hops, dropout, input_drop, attn_drop,
                                  label_drop, alpha, n_layers_1, n_layers_2, n_layers_3, act, pre_process, residual,pre_dropout,bns)
 
     def forward(self, feats_dict, label_emb):

@@ -14,7 +14,7 @@ import uuid
 import gc
 
 from load_dataset import prepare_data
-from utils import gen_output_torch, set_seed, train, train_rdd, test, gen_model_rdd, gen_model, gen_model_mag_rdd, gen_model_mag
+from utils import gen_output_torch, set_seed, train, train_rlu, test, gen_model_rlu, gen_model, gen_model_mag_rlu, gen_model_mag
 
 
 
@@ -32,7 +32,7 @@ def run(args, device):
     checkpt_file = f"./output/{args.dataset}/"+uuid.uuid4().hex
 
     for stage, epochs in enumerate(args.stages):
-        if stage > 0 and args.use_rdd:
+        if stage > 0 and args.use_rlu:
             predict_prob= torch.load(checkpt_file+'_{}.pt'.format(stage-1))/args.temp
             predict_prob = predict_prob.softmax(dim=1)
             train_node_nums=len(train_nid)
@@ -85,20 +85,20 @@ def run(args, device):
 
         #num_hops = args.num_hops + 1
 
-        if args.use_rdd == False:
-            print("not use rdd")
+        if args.use_rlu == False:
+            print("not use rlu")
             if args.dataset == "ogbn-mag":
                 _, num_feats, in_feats = feats[0].shape
                 model = gen_model_mag(args, num_feats, in_feats, num_classes)
             else:
                 model = gen_model(args, in_size, num_classes)
         else:
-            print("use rdd")
+            print("use rlu")
             if args.dataset == "ogbn-mag":
                 _, num_feats, in_feats = feats[0].shape
-                model = gen_model_mag_rdd(args, num_feats, in_feats, num_classes)
+                model = gen_model_mag_rlu(args, num_feats, in_feats, num_classes)
             else:
-                model = gen_model_rdd(args, in_size, num_classes)
+                model = gen_model_rlu(args, in_size, num_classes)
         print(model)
         model = model.to(device)
         print("# Params:", get_n_params(model))
@@ -119,9 +119,9 @@ def run(args, device):
             if stage == 0:
                 loss,acc=train(model, feats, labels, loss_fcn, optimizer, train_loader, label_emb,evaluator)
             elif stage == 1:
-                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
+                loss,acc=train_rlu(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
             else:
-                loss,acc=train_rdd(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
+                loss,acc=train_rlu(model, train_loader, enhance_loader, optimizer, evaluator, device, feats, labels, label_emb, predict_prob,args.gama)
             end = time.time()
 
             log = "Epoch {}, Time(s): {:.4f},Train loss: {:.4f}, Train acc: {:.4f} ".format(epoch, end - start,loss,acc*100)
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     parser.add_argument("--root", type=str, default='/data4/zwt/')
     parser.add_argument("--emb_path", type=str, default='/data4/zwt/NARS-main')
     parser.add_argument("--use-relation-subsets", type=str, default='/data4/zwt/NARS-main/sample_relation_subsets/examples/mag')
-    parser.add_argument("--use-rdd", action='store_true', default=False,
+    parser.add_argument("--use-rlu", action='store_true', default=False,
                         help="whether to use the reliable data distillation")
     parser.add_argument("--train-num-epochs", nargs='+',type=int, default=[100, 100],
                         help="The Train epoch setting for each stage.")
