@@ -50,6 +50,8 @@ For **ogbn-mag**:
 python main.py --use-rlu --method JK_GAMLP_RLU --stages 250 200 200 200 --train-num-epochs 0 0 0 0 --threshold 0.4 --input-drop 0.1 --att-drop 0 --label-drop 0 --pre-process --residual --dataset ogbn-mag --num-runs 10 --eval 10 --act leaky_relu --batch 10000 --patience 300 --n-layers-1 4 --n-layers-2 4 --label-num-hops 3 --bns --gama 10 --use-relation-subsets ./data/mag --emb_path ./data/
 ```
 
+To reproduce the results of **GAMLP**, run only the first stage will do the job.
+
 
 
 ## Node Classification Results:
