@@ -67,3 +67,15 @@ Performance comparison on **ogbn-papers100M**:
 Performance comparison on **ogbn-mag**:
 
 ![image-20210819194235072](./mag_perf.png)
+
+## Cite
+
+If you use GAMLP in a scientific publication, we would appreciate citations to the following paper:
+```
+ @article{zhang2021graph,
+  title={Graph attention multi-layer perceptron},
+  author={Zhang, Wentao and Yin, Ziqi and Sheng, Zeang and Ouyang, Wen and Li, Xiaosen and Tao, Yangyu and Yang, Zhi and Cui, Bin},
+  journal={arXiv preprint arXiv:2108.10097},
+  year={2021}
+}
+```
